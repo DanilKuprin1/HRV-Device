@@ -1,4 +1,4 @@
-# COMP 3004 Project
+# HRV-Device
 
 ## Team Members
 
