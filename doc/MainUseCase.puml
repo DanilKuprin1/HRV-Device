@@ -1,0 +1,13 @@
+@startuml MainUseCase
+
+left to right direction
+
+actor "User" as user
+
+rectangle "HeartWave Simulator" {
+  usecase "Record HRV Session" as record_hrv_session
+
+  user --> record_hrv_session
+}
+
+@enduml

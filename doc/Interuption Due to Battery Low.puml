@@ -1,0 +1,30 @@
+@startuml Normal Operation
+
+Actor User
+
+User -> startSession: start button click
+
+startSession -> AppState: start_session()
+startSession -> BreathPacerWidget: show()
+startSession -> HRContactLabel: show()
+startSession -> CoherenceIndicator: show()
+startSession -> hrvGraph: clear()
+startSession -> PulseSensor: start()
+
+PulseSensor -> PulseSensor: on_timer()
+PulseSensor -> PulseSensor: readLineInto()
+PulseSensor -> HRVGraph: addPoint()
+PulseSensor -> AppState: record_sample()
+PulseSensor -> Session: add_reading()
+Session -> Session: update_data()
+PulseSensor -> UI: display_changes()
+
+PulseSensor -> PulseSensor: on_timer()
+PulseSensor -> PulseSensor: readLineInto()
+BatterySensor -> UI: fully_discharched()
+UI -> UI: shutdown()
+BatterySensor -> AppState: stop_session()
+BatterySensor -> PulseSensor: stop()
+
+
+@enduml

@@ -1,0 +1,217 @@
+@startuml Normal Operation
+
+class BatteryIndicatorWidget{}
+
+class BreathPacerWidget{
+    -QTimer timer
+    -double progress
+    -double interval
+    -int direction
+    -void update_progress()
+}
+
+enum CoherenceLevel{
+  Low
+  Medium
+  High
+}
+
+class CoherenceIndicatorWidget{
+    +void set_level(CoherenceLevel level)
+    +CoherenceLevel get_level()
+    -void paintEvent(QPaintEvent * event) override
+}
+CoherenceIndicatorWidget --> CoherenceLevel
+
+class HRVGraphWidget{
+    +void clear()
+    +void add_point(double x, double y)
+    +void seal()
+    -QLineSeries* series
+    -int window_size
+    -QChart* chart
+    -QValueAxis* axis_x
+    -QValueAxis* axis_y
+    -QChartView* view
+    -QScrollBar* scroll_bar
+    -QVBoxLayout* layout
+    -bool sealed
+}
+
+class SessionListWidgetItem{
+  +SessionId id
+}
+
+class EmptySession {}
+
+enum AppStates{
+  IDLE
+  RECORDING
+  REVIEWING
+}
+
+class AppState {
+
+  +AppStates get_state() const
+
+  +void start_session()
+
+  +void pause_session()
+
+  +std::optional<double> record_sample(Sample sample)
+
+  +void resume_session()
+
+  +SessionId stop_session()
+
+  +const HistoricalSession& review_session(SessionId session_id)
+
+  +void delete_session(SessionId session_id)
+
+  +void clear_session_history()
+
+  +const RecordingSession& get_recording_session() const
+
+  +const std::vector<HistoricalSession>& get_session_history()
+
+  -std::variant<EmptySession, RecordingSession, HistoricalSession*> current_session
+
+}
+
+AppState --> AppStates
+AppState --> SessionHistory
+
+
+
+class MainWindow{
+
+    -void init_widgets()
+
+    -void connect_sensors()
+
+    -void startup()
+
+    -void shutdown()
+
+    -MainWindow* ui
+
+    -bool is_sensor_interrupted
+}
+
+MainWindow --> AppState
+MainWindow --> BatterySensor
+MainWindow --> PulseSensor
+
+
+class BatterySensor{
+
+    +double level() const
+    +void level_changed(double level)
+    +void fully_discharged()
+    +void start()
+    +void stop()
+    -void on_timer()
+
+    -int initial_charge
+    -int discharge_rate
+    -int charge
+    -QTimer timer
+}
+
+class PulseSensor {
+    +void sampled(PulseSensor::Status status, std::optional<Sample> sample)
+    +void start()
+    +void stop()
+    -void on_timer()
+
+    -QFile file
+
+    -QTextStream stream
+
+    -QString buffer
+    
+    -QTimer timer
+    -std::chrono::milliseconds time
+}
+
+struct Sample {
+  +std::chrono::milliseconds time_since_sensor_start
+  +std::chrono::milliseconds time_since_last_sample
+  +uint64_t heart_rate
+}
+
+struct SessionId {
+  +size_t id
+}
+
+struct Session {
+
+    +SessionId get_id() const
+
+    +time_t get_start_time() const
+
+  +const std::vector<Sample>& get_samples() const
+
+  +void add_reading(Sample sample)
+
+  +void serialize(std::ostream& out) const
+
+  +time_t start
+}
+Session --> SessionId
+Session --> Sample
+
+struct RecordingSession{
+
+  +std::vector<double> coherence_scores;
+
+  +double achievement_score;
+
+  +std::chrono::milliseconds duration;
+
+  +std::chrono::milliseconds since_last_coherence_update;
+}
+RecordingSession --> Session
+
+
+struct Summary {
++void serialize(std::ostream& out) const
++double percent_at_high_coherence = 0.0
++double percent_at_medium_coherence = 0.0
++double percent_at_low_coherence = 0.0
++double average_coherence_score = 0.0
++double achievement_score = 0.0
++std::chrono::milliseconds session_length
+}
+
+class HistoricalSession {
++Session session
++Summary summary
+}
+
+HistoricalSession--> Session
+HistoricalSession --> Summary 
+
+class SessionHistory {
+
++SessionId next_session_id()
+
++void add_session(Session session, Summary summary)
+
++bool remove_session(SessionId session_id)
+
++const std::vector<HistoricalSession>& get_sessions() const
+
++void clear()
+
+-bool serialize()
+
+-bool deserialize()
+}
+
+SessionHistory --> SessionId
+SessionHistory --> sessions
+
+
+@enduml
+
