@@ -3,40 +3,8 @@
 ## Team Members
 
 - Danil Kuprin
-  - UML Diagrams
-  - Use Cases
-  - Initial design of sessions
-  - Initial connection of GUI to simulation
-  - Initial session history design
-  - Code review
 - David Zhang
-  - Refactor of sessions
-  - Running and summary metrics
-  - State management
-  - Coherence indicator widget
-  - Pulse sensor interruptibility
-  - Code review
 - Mohajer Farhadpur
-  - CI
-  - Initial GUI design
-  - Pulse sensor
-  - Battery sensor
-  - Breath pacer widget
-  - Heart-rate graph widget
-  - Code review
-  - Traceability Matrix
-
-## Demo
-
-You can watch a screen recording of the app on [Loom](https://www.loom.com/share/ca1194a9b9174c9fa0a05e862dfd27c2).
-
-## Setup
-
-Ensure the course VM has the required dependencies installed before attempting to build the app.
-
-```sh
-sudo apt update && sudo apt install clang-8 libqt5charts5-dev
-```
 
 ## Design
 
